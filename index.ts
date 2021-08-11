@@ -1,12 +1,12 @@
 require('dotenv').config();
 
 import * as fs from 'fs';
-const { Client, Collection, Intents, MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
+const { Client, Collection, Intents, MessageButton } = require('discord.js');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 client.commands = new Collection();
 
-import { Message, User } from "discord.js";
+import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, User } from "discord.js";
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
@@ -68,11 +68,12 @@ const randomNumber = (min: number, max: number): number => {
     return Math.floor(Math.random() * max) + min;
 }
 
-client.on('interactionCreate', async (interaction) => {
+client.on('interactionCreate', async (interaction: ButtonInteraction) => {
 	if (!interaction.isButton()) return;
 
-    const deathRollIndex = currentDeathrolls.findIndex(currentDeathRoll => currentDeathRoll.interactionId === (interaction.message.interaction?.id || interaction.message.reference?.messageId));
-    const tempDeathRoll = currentDeathrolls[deathRollIndex];
+    // @ts-ignore
+    const deathRollIndex: number = currentDeathrolls.findIndex(currentDeathRoll => currentDeathRoll.interactionId === (interaction.message.interaction?.id || interaction.message.reference?.messageId));
+    const tempDeathRoll: ICurrentDeathRoll = currentDeathrolls[deathRollIndex];
 
     if (deathRollIndex === -1) return;
 
@@ -82,7 +83,7 @@ client.on('interactionCreate', async (interaction) => {
         const newRandomRoll: number = randomNumber(1, tempDeathRoll.currentRoll);
 
         if (newRandomRoll === 1) {
-            const embed = new MessageEmbed()
+            const embed: MessageEmbed = new MessageEmbed()
 			.setColor('#0099ff')
             .setTitle('Roll')
 			.setDescription(`${tempDeathRoll.currentPlayer.username} rolls **${newRandomRoll}** (1-${tempDeathRoll.currentRoll}).\n\nAnd loses the Death Roll - GG!`);
@@ -99,7 +100,7 @@ client.on('interactionCreate', async (interaction) => {
                 };
             });
         } else {
-            const row = new MessageActionRow()
+            const row: MessageActionRow = new MessageActionRow()
 			.addComponents(
 				new MessageButton()
 					.setCustomId('primary')
@@ -107,7 +108,7 @@ client.on('interactionCreate', async (interaction) => {
 					.setStyle('PRIMARY'),
 			);
 
-            const embed = new MessageEmbed()
+            const embed: MessageEmbed = new MessageEmbed()
 			.setColor('#0099ff')
             .setTitle('Roll')
 			.setDescription(`${tempDeathRoll.currentPlayer.username} rolls **${newRandomRoll}** (1-${tempDeathRoll.currentRoll}).`);
@@ -130,22 +131,22 @@ client.on('interactionCreate', async (interaction) => {
 	}
 });
 
-client.on('interactionCreate', async interaction => {
+client.on('interactionCreate', async (interaction: CommandInteraction) => {
 	if (!interaction.isCommand()) return;
 
 	if (!client.commands.has(interaction.commandName)) return;
 
-    if (interaction.options._hoistedOptions[0].user.bot || interaction.options._hoistedOptions[1].user.bot) return;
+    if (interaction.options.get('playerone').user.bot || interaction.options.get('playertwo').user.bot) return;
 
 	try {
         currentDeathrolls.push({
             interactionId: interaction.id,
-            startedBy: interaction.user,
-            playerOne: interaction.options._hoistedOptions[0].user,
-            playerTwo: interaction.options._hoistedOptions[1].user,
-            startnumber: interaction.options._hoistedOptions[2].value,
-            currentRoll: interaction.options._hoistedOptions[2].value,
-            currentPlayer: interaction.options._hoistedOptions[0].user
+            startedBy: interaction.user.username,
+            playerOne: interaction.options.get('playerone').user,
+            playerTwo: interaction.options.get('playertwo').user,
+            startnumber: interaction.options.get('startnumber').value as number,
+            currentRoll: interaction.options.get('startnumber').value as number,
+            currentPlayer: interaction.options.get('playerone').user
         })
 
 		await client.commands.get(interaction.commandName).execute(interaction);

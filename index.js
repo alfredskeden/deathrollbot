@@ -35,12 +35,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 require('dotenv').config();
 var fs = require("fs");
-var _a = require('discord.js'), Client = _a.Client, Collection = _a.Collection, Intents = _a.Intents, MessageActionRow = _a.MessageActionRow, MessageButton = _a.MessageButton, MessageEmbed = _a.MessageEmbed;
+var _a = require('discord.js'), Client = _a.Client, Collection = _a.Collection, Intents = _a.Intents, MessageButton = _a.MessageButton;
 var client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 client.commands = new Collection();
+var discord_js_1 = require("discord.js");
 var commandFiles = fs.readdirSync('./commands').filter(function (file) { return file.endsWith('.js'); });
 for (var _i = 0, commandFiles_1 = commandFiles; _i < commandFiles_1.length; _i++) {
     var file = commandFiles_1[_i];
@@ -57,13 +58,13 @@ client.on('messageCreate', function (message) { return __awaiter(void 0, void 0,
     return __generator(this, function (_e) {
         switch (_e.label) {
             case 0:
-                if (!!((_a = client.application) === null || _a === void 0 ? void 0 : _a.owner)) return [3 /*break*/, 2];
-                return [4 /*yield*/, ((_b = client.application) === null || _b === void 0 ? void 0 : _b.fetch())];
+                if (!!((_a = client.application) === null || _a === void 0 ? void 0 : _a.owner)) return [3, 2];
+                return [4, ((_b = client.application) === null || _b === void 0 ? void 0 : _b.fetch())];
             case 1:
                 _e.sent();
                 _e.label = 2;
             case 2:
-                if (!(message.content.toLowerCase() === '!deploy' && message.author.id === ((_c = client.application) === null || _c === void 0 ? void 0 : _c.owner.id))) return [3 /*break*/, 4];
+                if (!(message.content.toLowerCase() === '!deploy' && message.author.id === ((_c = client.application) === null || _c === void 0 ? void 0 : _c.owner.id))) return [3, 4];
                 data = {
                     name: 'deathroll',
                     description: 'Starts a deahtroll against two players.',
@@ -71,27 +72,27 @@ client.on('messageCreate', function (message) { return __awaiter(void 0, void 0,
                             name: 'playerone',
                             type: 'USER',
                             description: 'Player to start the deathroll.',
-                            required: true
+                            required: true,
                         },
                         {
                             name: 'playertwo',
                             type: 'USER',
                             description: 'Second player to roll.',
-                            required: true
+                            required: true,
                         },
                         {
                             name: 'startnumber',
                             type: 'INTEGER',
                             description: 'The start integer.',
-                            required: true
-                        }]
+                            required: true,
+                        }],
                 };
-                return [4 /*yield*/, ((_d = client.guilds.cache.get(process.env.WALLA_ID)) === null || _d === void 0 ? void 0 : _d.commands.create(data))];
+                return [4, ((_d = client.guilds.cache.get(process.env.WALLA_ID)) === null || _d === void 0 ? void 0 : _d.commands.create(data))];
             case 3:
                 _e.sent();
                 console.log("Deployment done!");
                 _e.label = 4;
-            case 4: return [2 /*return*/];
+            case 4: return [2];
         }
     });
 }); });
@@ -99,73 +100,74 @@ var randomNumber = function (min, max) {
     return Math.floor(Math.random() * max) + min;
 };
 client.on('interactionCreate', function (interaction) { return __awaiter(void 0, void 0, void 0, function () {
-    var deathRollIndex, newRandomRoll_1, embed, row, embed, error_1;
+    var deathRollIndex, tempDeathRoll, newRandomRoll_1, embed, row, embed, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 if (!interaction.isButton())
-                    return [2 /*return*/];
+                    return [2];
                 deathRollIndex = currentDeathrolls.findIndex(function (currentDeathRoll) { var _a, _b; return currentDeathRoll.interactionId === (((_a = interaction.message.interaction) === null || _a === void 0 ? void 0 : _a.id) || ((_b = interaction.message.reference) === null || _b === void 0 ? void 0 : _b.messageId)); });
+                tempDeathRoll = currentDeathrolls[deathRollIndex];
                 if (deathRollIndex === -1)
-                    return [2 /*return*/];
+                    return [2];
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 6, , 8]);
-                if (!(interaction.user === currentDeathrolls[deathRollIndex].currentPlayer))
-                    return [2 /*return*/];
-                newRandomRoll_1 = randomNumber(1, currentDeathrolls[deathRollIndex].currentRoll);
-                if (!(newRandomRoll_1 === 1)) return [3 /*break*/, 3];
-                embed = new MessageEmbed()
+                if (!(interaction.user === tempDeathRoll.currentPlayer))
+                    return [2];
+                newRandomRoll_1 = randomNumber(1, tempDeathRoll.currentRoll);
+                if (!(newRandomRoll_1 === 1)) return [3, 3];
+                embed = new discord_js_1.MessageEmbed()
                     .setColor('#0099ff')
                     .setTitle('Roll')
-                    .setDescription(currentDeathrolls[deathRollIndex].currentPlayer.username + " rolls **" + newRandomRoll_1 + "** (1-" + currentDeathrolls[deathRollIndex].currentRoll + ").\n\nAnd loses the Death Roll - GG!");
-                return [4 /*yield*/, interaction.reply({ embeds: [embed] }).then(function () {
+                    .setDescription(tempDeathRoll.currentPlayer.username + " rolls **" + newRandomRoll_1 + "** (1-" + tempDeathRoll.currentRoll + ").\n\nAnd loses the Death Roll - GG!");
+                return [4, interaction.reply({ embeds: [embed] }).then(function () {
                         currentDeathrolls[deathRollIndex] = {
                             interactionId: "",
-                            startedBy: currentDeathrolls[deathRollIndex].startedBy,
-                            playerOne: currentDeathrolls[deathRollIndex].playerOne,
-                            playerTwo: currentDeathrolls[deathRollIndex].playerTwo,
-                            startnumber: currentDeathrolls[deathRollIndex].startnumber,
+                            startedBy: tempDeathRoll.startedBy,
+                            playerOne: tempDeathRoll.playerOne,
+                            playerTwo: tempDeathRoll.playerTwo,
+                            startnumber: tempDeathRoll.startnumber,
                             currentRoll: newRandomRoll_1,
-                            currentPlayer: currentDeathrolls[deathRollIndex].playerOne
+                            currentPlayer: tempDeathRoll.playerOne
                         };
                     })];
             case 2:
                 _a.sent();
-                return [3 /*break*/, 5];
+                return [3, 5];
             case 3:
-                row = new MessageActionRow()
+                row = new discord_js_1.MessageActionRow()
                     .addComponents(new MessageButton()
                     .setCustomId('primary')
                     .setLabel('Next roll')
                     .setStyle('PRIMARY'));
-                embed = new MessageEmbed()
+                embed = new discord_js_1.MessageEmbed()
                     .setColor('#0099ff')
                     .setTitle('Roll')
-                    .setDescription(currentDeathrolls[deathRollIndex].currentPlayer.username + " rolls **" + newRandomRoll_1 + "** (1-" + currentDeathrolls[deathRollIndex].currentRoll + ").");
-                return [4 /*yield*/, interaction.reply({ content: "<@" + ((currentDeathrolls[deathRollIndex].currentPlayer.id === currentDeathrolls[deathRollIndex].playerOne.id) ? currentDeathrolls[deathRollIndex].playerTwo.id : currentDeathrolls[deathRollIndex].playerOne.id) + ">", embeds: [embed], components: [row] }).then(function () {
+                    .setDescription(tempDeathRoll.currentPlayer.username + " rolls **" + newRandomRoll_1 + "** (1-" + tempDeathRoll.currentRoll + ").");
+                return [4, interaction.reply({ content: "<@" + ((tempDeathRoll.currentPlayer.id === tempDeathRoll.playerOne.id) ? tempDeathRoll.playerTwo.id : tempDeathRoll.playerOne.id) + ">", embeds: [embed], components: [row] }).then(function () {
                         currentDeathrolls[deathRollIndex] = {
                             interactionId: interaction.message.id,
-                            startedBy: currentDeathrolls[deathRollIndex].startedBy,
-                            playerOne: currentDeathrolls[deathRollIndex].playerOne,
-                            playerTwo: currentDeathrolls[deathRollIndex].playerTwo,
-                            startnumber: currentDeathrolls[deathRollIndex].startnumber,
+                            startedBy: tempDeathRoll.startedBy,
+                            playerOne: tempDeathRoll.playerOne,
+                            playerTwo: tempDeathRoll.playerTwo,
+                            startnumber: tempDeathRoll.startnumber,
                             currentRoll: newRandomRoll_1,
-                            currentPlayer: (currentDeathrolls[deathRollIndex].currentPlayer.id === currentDeathrolls[deathRollIndex].playerOne.id) ? currentDeathrolls[deathRollIndex].playerTwo : currentDeathrolls[deathRollIndex].playerOne
+                            currentPlayer: (tempDeathRoll.currentPlayer.id === tempDeathRoll.playerOne.id) ? tempDeathRoll.playerTwo : tempDeathRoll.playerOne
                         };
                     })];
             case 4:
                 _a.sent();
                 _a.label = 5;
-            case 5: return [3 /*break*/, 8];
+            case 5: return [3, 8];
             case 6:
                 error_1 = _a.sent();
                 console.error(error_1);
-                return [4 /*yield*/, interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true })];
+                return [4, interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true })];
             case 7:
                 _a.sent();
-                return [3 /*break*/, 8];
-            case 8: return [2 /*return*/];
+                return [3, 8];
+            case 8: return [2];
         }
     });
 }); });
@@ -175,35 +177,35 @@ client.on('interactionCreate', function (interaction) { return __awaiter(void 0,
         switch (_a.label) {
             case 0:
                 if (!interaction.isCommand())
-                    return [2 /*return*/];
+                    return [2];
                 if (!client.commands.has(interaction.commandName))
-                    return [2 /*return*/];
-                if (interaction.options._hoistedOptions[0].user.bot || interaction.options._hoistedOptions[1].user.bot)
-                    return [2 /*return*/];
+                    return [2];
+                if (interaction.options.get('playerone').user.bot || interaction.options.get('playertwo').user.bot)
+                    return [2];
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 3, , 5]);
                 currentDeathrolls.push({
                     interactionId: interaction.id,
-                    startedBy: interaction.user,
-                    playerOne: interaction.options._hoistedOptions[0].user,
-                    playerTwo: interaction.options._hoistedOptions[1].user,
-                    startnumber: interaction.options._hoistedOptions[2].value,
-                    currentRoll: interaction.options._hoistedOptions[2].value,
-                    currentPlayer: interaction.options._hoistedOptions[0].user
+                    startedBy: interaction.user.username,
+                    playerOne: interaction.options.get('playerone').user,
+                    playerTwo: interaction.options.get('playertwo').user,
+                    startnumber: interaction.options.get('startnumber').value,
+                    currentRoll: interaction.options.get('startnumber').value,
+                    currentPlayer: interaction.options.get('playerone').user
                 });
-                return [4 /*yield*/, client.commands.get(interaction.commandName).execute(interaction)];
+                return [4, client.commands.get(interaction.commandName).execute(interaction)];
             case 2:
                 _a.sent();
-                return [3 /*break*/, 5];
+                return [3, 5];
             case 3:
                 error_2 = _a.sent();
                 console.error(error_2);
-                return [4 /*yield*/, interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true })];
+                return [4, interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true })];
             case 4:
                 _a.sent();
-                return [3 /*break*/, 5];
-            case 5: return [2 /*return*/];
+                return [3, 5];
+            case 5: return [2];
         }
     });
 }); });
