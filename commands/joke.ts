@@ -1,6 +1,8 @@
-import { MessageEmbed, CommandInteraction } from 'discord.js';
+import { MessageEmbed, CommandInteraction, ApplicationCommandData } from 'discord.js';
 
 import axios from 'axios';
+
+import { getRandomStringFromArray } from '../helper/helper';
 
 const embed: MessageEmbed = new MessageEmbed().setColor(`RANDOM`);
 
@@ -19,10 +21,6 @@ const lolGifs: Array<string> = [
   `https://c.tenor.com/ISfg1epIVZ0AAAAd/funny-smile.gif`,
 ];
 
-const getRandomGif = (gifUrls: Array<string>): string => {
-  return gifUrls[Math.floor(Math.random() * gifUrls.length)];
-};
-
 module.exports = {
   name: 'joke',
   description: 'random programming joke.',
@@ -30,7 +28,7 @@ module.exports = {
     if (!interaction.isCommand()) return;
 
     axios.get(`https://official-joke-api.appspot.com/jokes/programming/random`).then(async (res) => {
-      embed.setTitle(`${res.data[0].setup}`).setDescription(`${res.data[0].punchline}`).setImage(getRandomGif(lolGifs));
+      embed.setTitle(`${res.data[0].setup}`).setDescription(`${res.data[0].punchline}`).setImage(getRandomStringFromArray(lolGifs));
       await interaction.reply({ embeds: [embed] });
     });
   },

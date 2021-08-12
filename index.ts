@@ -1,49 +1,16 @@
 require('dotenv').config();
 
 import * as fs from 'fs';
-import {
-  Client,
-  Collection,
-  Intents,
-  MessageButton,
-  ApplicationCommandData,
-  ButtonInteraction,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-  MessageActionRow,
-  MessageEmbed,
-  SelectMenuInteraction,
-  User,
-} from 'discord.js';
+import { Client, Collection, Intents, MessageButton, ApplicationCommandData, ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, SelectMenuInteraction } from 'discord.js';
 
-import { SlashCommandBuilder } from '@discordjs/builders';
-
-interface command {
-  name: string;
-  description: string;
-  execute: Function;
-}
+import { randomNumber, errorReply } from './helper/helper';
+import { ICurrentDeathRoll, ICommand } from './helper/interfaces';
+import { deathrollCommandData, jokeCommandData, testCommandData, weatherCommandData } from './helper/slashcommands';
 
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 });
-const commands = new Collection<unknown, command>();
-
-const errorReply: InteractionReplyOptions = {
-  content: 'There was an error while executing this command!',
-  ephemeral: true,
-};
-
-interface ICurrentDeathRoll {
-  interactionId: string;
-  startedBy: string;
-  playerOne: User;
-  playerTwo: User;
-  startnumber: number;
-  currentRoll: number;
-  currentPlayer: User;
-}
+const commands = new Collection<unknown, ICommand>();
 
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
 
@@ -58,72 +25,28 @@ client.once('ready', () => {
   console.log('Ready!');
 });
 
-/** For messages */
+/** For each message */
 client.on('messageCreate', async (message: Message) => {
   if (!client.application?.owner) await client.application?.fetch();
 
-  var commandData: ApplicationCommandData;
-  var commandBuilder: any;
+  if (message.author.id === client.application?.owner.id) {
+    if (message.content.toLowerCase() === '!deploydeathroll') {
+      await client.guilds.cache.get(message.guild.id)?.commands.create(deathrollCommandData);
+    }
 
-  if (message.content.toLowerCase() === '!deploy' && message.author.id === client.application?.owner.id) {
-    commandData = {
-      name: 'deathroll',
-      description: 'Starts a deahtroll against two players.',
-      options: [
-        {
-          name: 'playerone',
-          type: 'USER',
-          description: 'Player to start the deathroll.',
-          required: true,
-        },
-        {
-          name: 'playertwo',
-          type: 'USER',
-          description: 'Second player to roll.',
-          required: true,
-        },
-        {
-          name: 'startnumber',
-          type: 'INTEGER',
-          description: 'The start integer.',
-          required: true,
-        },
-      ],
-    };
-  }
+    if (message.content.toLowerCase() === '!deploytest') {
+      await client.guilds.cache.get(message.guild.id)?.commands.create(testCommandData);
+    }
 
-  if (message.content.toLowerCase() === '!deploytest' && message.author.id === client.application?.owner.id) {
-    commandData = {
-      name: 'test',
-      description: 'Starts the testing command.',
-    };
-  }
+    if (message.content.toLowerCase() === '!deployweather') {
+      await client.guilds.cache.get(message.guild.id)?.commands.create(weatherCommandData);
+    }
 
-  if (message.content.toLowerCase() === '!deployweather' && message.author.id === client.application?.owner.id) {
-    commandBuilder = new SlashCommandBuilder()
-      .setName('weather')
-      .setDescription('Fetches the weather from an api!')
-      .addStringOption((option) => {
-        return option.setName('location').setDescription('Where do you want to check the weather?').setRequired(true);
-      });
-  }
-
-  if (message.content.toLowerCase() === '!deployjoke' && message.author.id === client.application?.owner.id) {
-    commandData = {
-      name: 'joke',
-      description: 'random programming joke.',
-    };
-  }
-
-  if (commandData || commandBuilder) {
-    console.log('Deployment of done!');
-    await client.guilds.cache.get(message.guild.id)?.commands.create(commandData ? commandData : commandBuilder);
+    if (message.content.toLowerCase() === '!deployjoke') {
+      await client.guilds.cache.get(message.guild.id)?.commands.create(jokeCommandData);
+    }
   }
 });
-
-const randomNumber = (min: number, max: number): number => {
-  return Math.floor(Math.random() * max) + min;
-};
 
 /** interaction for SelectMenu */
 client.on('interactionCreate', async (interaction: SelectMenuInteraction) => {
