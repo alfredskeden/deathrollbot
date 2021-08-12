@@ -2,28 +2,33 @@ require('dotenv').config();
 
 import * as fs from 'fs';
 import {
+  Client,
+  Collection,
+  Intents,
+  MessageButton,
   ApplicationCommandData,
   ButtonInteraction,
-  ColorResolvable,
   CommandInteraction,
-  Guild,
-  Interaction,
   InteractionReplyOptions,
   Message,
   MessageActionRow,
   MessageEmbed,
-  MessagePayload,
   SelectMenuInteraction,
   User,
 } from 'discord.js';
 
 import { SlashCommandBuilder } from '@discordjs/builders';
-const { Client, Collection, Intents, MessageButton } = require('discord.js');
+
+interface command {
+  name: string;
+  description: string;
+  execute: Function;
+}
 
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 });
-client.commands = new Collection();
+const commands = new Collection<unknown, command>();
 
 const errorReply: InteractionReplyOptions = {
   content: 'There was an error while executing this command!',
@@ -44,7 +49,7 @@ const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith
 
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
-  client.commands.set(command.name, command);
+  commands.set(command.name, command);
 }
 
 const currentDeathrolls: Array<ICurrentDeathRoll> = [];
@@ -53,6 +58,7 @@ client.once('ready', () => {
   console.log('Ready!');
 });
 
+/** For messages */
 client.on('messageCreate', async (message: Message) => {
   if (!client.application?.owner) await client.application?.fetch();
 
@@ -102,21 +108,31 @@ client.on('messageCreate', async (message: Message) => {
       });
   }
 
-  console.log('Deployment of done!');
+  if (message.content.toLowerCase() === '!deployjoke' && message.author.id === client.application?.owner.id) {
+    commandData = {
+      name: 'joke',
+      description: 'random programming joke.',
+    };
+  }
 
-  await client.guilds.cache.get(message.guild.id)?.commands.create(commandData ? commandData : commandBuilder);
+  if (commandData || commandBuilder) {
+    console.log('Deployment of done!');
+    await client.guilds.cache.get(message.guild.id)?.commands.create(commandData ? commandData : commandBuilder);
+  }
 });
 
 const randomNumber = (min: number, max: number): number => {
   return Math.floor(Math.random() * max) + min;
 };
 
+/** interaction for SelectMenu */
 client.on('interactionCreate', async (interaction: SelectMenuInteraction) => {
   if (!interaction.isSelectMenu()) return;
 
   console.log(interaction);
 });
 
+/** Interaction for buttons */
 client.on('interactionCreate', async (interaction: ButtonInteraction) => {
   if (!interaction.isButton()) return;
 
@@ -185,10 +201,11 @@ client.on('interactionCreate', async (interaction: ButtonInteraction) => {
   }
 });
 
+/** Interaction for slash commands */
 client.on('interactionCreate', async (interaction: CommandInteraction) => {
   if (!interaction.isCommand()) return;
 
-  if (!client.commands.has(interaction.commandName)) return;
+  if (!commands.has(interaction.commandName)) return;
 
   try {
     if (interaction.commandName === 'deathroll') {
@@ -205,7 +222,7 @@ client.on('interactionCreate', async (interaction: CommandInteraction) => {
       });
     }
 
-    await client.commands.get(interaction.commandName).execute(interaction);
+    await commands.get(interaction.commandName).execute(interaction);
   } catch (error) {
     console.error(error);
     await interaction.reply(errorReply);
