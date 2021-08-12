@@ -13,21 +13,11 @@ const errorReply = {
   ephemeral: true,
 };
 
-import {
-  ButtonInteraction,
-  CommandInteraction,
-  Message,
-  MessageActionRow,
-  MessageEmbed,
-  SelectMenuInteraction,
-  User,
-} from 'discord.js';
+import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, SelectMenuInteraction, User } from 'discord.js';
 
 import { SlashCommandBuilder } from '@discordjs/builders';
 
-const commandFiles = fs
-  .readdirSync('./commands')
-  .filter((file) => file.endsWith('.js'));
+const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
 
 interface ICurrentDeathRoll {
   interactionId: string;
@@ -53,10 +43,7 @@ const currentDeathrolls: Array<ICurrentDeathRoll> = [];
 client.on('messageCreate', async (message: Message) => {
   if (!client.application?.owner) await client.application?.fetch();
 
-  if (
-    message.content.toLowerCase() === '!deploy' &&
-    message.author.id === client.application?.owner.id
-  ) {
+  if (message.content.toLowerCase() === '!deploy' && message.author.id === client.application?.owner.id) {
     const data = {
       name: 'deathroll',
       description: 'Starts a deahtroll against two players.',
@@ -87,10 +74,7 @@ client.on('messageCreate', async (message: Message) => {
     console.log('Deployment done!');
   }
 
-  if (
-    message.content.toLowerCase() === '!deploytest' &&
-    message.author.id === client.application?.owner.id
-  ) {
+  if (message.content.toLowerCase() === '!deploytest' && message.author.id === client.application?.owner.id) {
     const data = {
       name: 'test',
       description: 'Starts the testing command.',
@@ -101,21 +85,15 @@ client.on('messageCreate', async (message: Message) => {
     console.log('Deployment of test done!');
   }
 
-  if (
-    message.content.toLowerCase() === '!deployweather' &&
-    message.author.id === client.application?.owner.id
-  ) {
+  if (message.content.toLowerCase() === '!deployweather' && message.author.id === client.application?.owner.id) {
     const data = new SlashCommandBuilder()
       .setName('weather')
       .setDescription('Fetches the weather from an api!')
       .addStringOption((option) => {
-        return option
-          .setName('location')
-          .setDescription('Where do you want to check the weather?')
-          .setRequired(true);
+        return option.setName('location').setDescription('Where do you want to check the weather?').setRequired(true);
       });
 
-    await client.guilds.cache.get(process.env.GUILD_ID)?.commands.create(data);
+    await client.guilds.cache.get(process.env.WALLA_ID)?.commands.create(data);
 
     console.log('Deployment of weather done!');
   }
@@ -154,9 +132,7 @@ client.on('interactionCreate', async (interaction: ButtonInteraction) => {
       const embed: MessageEmbed = new MessageEmbed()
         .setColor('#0099ff')
         .setTitle('Roll')
-        .setDescription(
-          `${tempDeathRoll.currentPlayer.username} rolls **${newRandomRoll}** (1-${tempDeathRoll.currentRoll}).\n\nAnd loses the Death Roll - GG!`
-        );
+        .setDescription(`${tempDeathRoll.currentPlayer.username} rolls **${newRandomRoll}** (1-${tempDeathRoll.currentRoll}).\n\nAnd loses the Death Roll - GG!`);
 
       await interaction.reply({ embeds: [embed] }).then(() => {
         currentDeathrolls[deathRollIndex] = {
@@ -170,27 +146,16 @@ client.on('interactionCreate', async (interaction: ButtonInteraction) => {
         };
       });
     } else {
-      const row: MessageActionRow = new MessageActionRow().addComponents(
-        new MessageButton()
-          .setCustomId('primary')
-          .setLabel('Next roll')
-          .setStyle('PRIMARY')
-      );
+      const row: MessageActionRow = new MessageActionRow().addComponents(new MessageButton().setCustomId('primary').setLabel('Next roll').setStyle('PRIMARY'));
 
       const embed: MessageEmbed = new MessageEmbed()
         .setColor('#0099ff')
         .setTitle('Roll')
-        .setDescription(
-          `${tempDeathRoll.currentPlayer.username} rolls **${newRandomRoll}** (1-${tempDeathRoll.currentRoll}).`
-        );
+        .setDescription(`${tempDeathRoll.currentPlayer.username} rolls **${newRandomRoll}** (1-${tempDeathRoll.currentRoll}).`);
 
       await interaction
         .reply({
-          content: `<@${
-            tempDeathRoll.currentPlayer.id === tempDeathRoll.playerOne.id
-              ? tempDeathRoll.playerTwo.id
-              : tempDeathRoll.playerOne.id
-          }>`,
+          content: `<@${tempDeathRoll.currentPlayer.id === tempDeathRoll.playerOne.id ? tempDeathRoll.playerTwo.id : tempDeathRoll.playerOne.id}>`,
           embeds: [embed],
           components: [row],
         })
@@ -202,10 +167,7 @@ client.on('interactionCreate', async (interaction: ButtonInteraction) => {
             playerTwo: tempDeathRoll.playerTwo,
             startnumber: tempDeathRoll.startnumber,
             currentRoll: newRandomRoll,
-            currentPlayer:
-              tempDeathRoll.currentPlayer.id === tempDeathRoll.playerOne.id
-                ? tempDeathRoll.playerTwo
-                : tempDeathRoll.playerOne,
+            currentPlayer: tempDeathRoll.currentPlayer.id === tempDeathRoll.playerOne.id ? tempDeathRoll.playerTwo : tempDeathRoll.playerOne,
           };
         });
     }
@@ -222,11 +184,7 @@ client.on('interactionCreate', async (interaction: CommandInteraction) => {
 
   try {
     if (interaction.commandName === 'deathroll') {
-      if (
-        interaction.options.get('playerone').user.bot ||
-        interaction.options.get('playertwo').user.bot
-      )
-        return;
+      if (interaction.options.get('playerone').user.bot || interaction.options.get('playertwo').user.bot) return;
 
       currentDeathrolls.push({
         interactionId: interaction.id,

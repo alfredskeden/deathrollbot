@@ -7,9 +7,7 @@ module.exports = {
     if (!interaction.isCommand()) return;
 
     await interaction.reply({
-      content: `https://wttr.in/${
-        interaction.options.get('location').value
-      }.png?format=v2`,
+      content: `https://wttr.in/${interaction.options.get('location').value}.png?format=v2&lang=sv`,
     });
   },
 };

@@ -1,11 +1,4 @@
-import {
-  MessageActionRow,
-  MessageSelectMenu,
-  MessageEmbed,
-  CommandInteraction,
-  MessageButton,
-  MessageSelectOptionData,
-} from 'discord.js';
+import { MessageActionRow, MessageSelectMenu, MessageEmbed, CommandInteraction, MessageButton, MessageSelectOptionData } from 'discord.js';
 
 const messageSelectOptionData: Array<MessageSelectOptionData> = [
   {
@@ -24,22 +17,11 @@ const messageSelectOptionData: Array<MessageSelectOptionData> = [
   },
 ];
 
-const row1: MessageActionRow = new MessageActionRow().addComponents(
-  new MessageSelectMenu()
-    .addOptions(messageSelectOptionData)
-    .setCustomId('This is a test message')
-);
+const row1: MessageActionRow = new MessageActionRow().addComponents(new MessageSelectMenu().addOptions(messageSelectOptionData).setCustomId('This is a test message'));
 
-const row2: MessageActionRow = new MessageActionRow().addComponents(
-  new MessageButton()
-    .setCustomId('applyButton')
-    .setLabel('ok')
-    .setStyle('SECONDARY')
-);
+const row2: MessageActionRow = new MessageActionRow().addComponents(new MessageButton().setCustomId('applyButton').setLabel('ok').setStyle('SECONDARY'));
 
-const embed: MessageEmbed = new MessageEmbed()
-  .setColor('#DB664F')
-  .setDescription(`This is a test message.`);
+const embed: MessageEmbed = new MessageEmbed().setColor('#DB664F').setDescription(`This is a test message.`);
 
 module.exports = {
   name: 'test',
