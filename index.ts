@@ -1,6 +1,23 @@
 require('dotenv').config();
 
 import * as fs from 'fs';
+import {
+  ApplicationCommandData,
+  ButtonInteraction,
+  ColorResolvable,
+  CommandInteraction,
+  Guild,
+  Interaction,
+  InteractionReplyOptions,
+  Message,
+  MessageActionRow,
+  MessageEmbed,
+  MessagePayload,
+  SelectMenuInteraction,
+  User,
+} from 'discord.js';
+
+import { SlashCommandBuilder } from '@discordjs/builders';
 const { Client, Collection, Intents, MessageButton } = require('discord.js');
 
 const client = new Client({
@@ -8,16 +25,10 @@ const client = new Client({
 });
 client.commands = new Collection();
 
-const errorReply = {
+const errorReply: InteractionReplyOptions = {
   content: 'There was an error while executing this command!',
   ephemeral: true,
 };
-
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, SelectMenuInteraction, User } from 'discord.js';
-
-import { SlashCommandBuilder } from '@discordjs/builders';
-
-const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
 
 interface ICurrentDeathRoll {
   interactionId: string;
@@ -29,22 +40,27 @@ interface ICurrentDeathRoll {
   currentPlayer: User;
 }
 
+const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
+
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
   client.commands.set(command.name, command);
 }
 
+const currentDeathrolls: Array<ICurrentDeathRoll> = [];
+
 client.once('ready', () => {
   console.log('Ready!');
 });
 
-const currentDeathrolls: Array<ICurrentDeathRoll> = [];
-
 client.on('messageCreate', async (message: Message) => {
   if (!client.application?.owner) await client.application?.fetch();
 
+  var commandData: ApplicationCommandData;
+  var commandBuilder: any;
+
   if (message.content.toLowerCase() === '!deploy' && message.author.id === client.application?.owner.id) {
-    const data = {
+    commandData = {
       name: 'deathroll',
       description: 'Starts a deahtroll against two players.',
       options: [
@@ -68,35 +84,27 @@ client.on('messageCreate', async (message: Message) => {
         },
       ],
     };
-
-    await client.guilds.cache.get(process.env.WALLA_ID)?.commands.create(data);
-
-    console.log('Deployment done!');
   }
 
   if (message.content.toLowerCase() === '!deploytest' && message.author.id === client.application?.owner.id) {
-    const data = {
+    commandData = {
       name: 'test',
       description: 'Starts the testing command.',
     };
-
-    await client.guilds.cache.get(process.env.GUILD_ID)?.commands.create(data);
-
-    console.log('Deployment of test done!');
   }
 
   if (message.content.toLowerCase() === '!deployweather' && message.author.id === client.application?.owner.id) {
-    const data = new SlashCommandBuilder()
+    commandBuilder = new SlashCommandBuilder()
       .setName('weather')
       .setDescription('Fetches the weather from an api!')
       .addStringOption((option) => {
         return option.setName('location').setDescription('Where do you want to check the weather?').setRequired(true);
       });
-
-    await client.guilds.cache.get(process.env.WALLA_ID)?.commands.create(data);
-
-    console.log('Deployment of weather done!');
   }
+
+  console.log('Deployment of done!');
+
+  await client.guilds.cache.get(message.guild.id)?.commands.create(commandData ? commandData : commandBuilder);
 });
 
 const randomNumber = (min: number, max: number): number => {
@@ -130,7 +138,7 @@ client.on('interactionCreate', async (interaction: ButtonInteraction) => {
 
     if (newRandomRoll === 1) {
       const embed: MessageEmbed = new MessageEmbed()
-        .setColor('#0099ff')
+        .setColor(`RANDOM`)
         .setTitle('Roll')
         .setDescription(`${tempDeathRoll.currentPlayer.username} rolls **${newRandomRoll}** (1-${tempDeathRoll.currentRoll}).\n\nAnd loses the Death Roll - GG!`);
 
@@ -149,7 +157,7 @@ client.on('interactionCreate', async (interaction: ButtonInteraction) => {
       const row: MessageActionRow = new MessageActionRow().addComponents(new MessageButton().setCustomId('primary').setLabel('Next roll').setStyle('PRIMARY'));
 
       const embed: MessageEmbed = new MessageEmbed()
-        .setColor('#0099ff')
+        .setColor(`RANDOM`)
         .setTitle('Roll')
         .setDescription(`${tempDeathRoll.currentPlayer.username} rolls **${newRandomRoll}** (1-${tempDeathRoll.currentRoll}).`);
 

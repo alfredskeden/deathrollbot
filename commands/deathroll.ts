@@ -2,7 +2,7 @@ import { MessageActionRow, MessageButton, MessageEmbed, CommandInteraction } fro
 
 const row: MessageActionRow = new MessageActionRow().addComponents(new MessageButton().setCustomId('primary').setLabel('Roll').setStyle('PRIMARY'));
 
-const embed: MessageEmbed = new MessageEmbed().setColor('#DB664F');
+const embed: MessageEmbed = new MessageEmbed().setColor(`RANDOM`);
 
 module.exports = {
   name: 'deathroll',
@@ -16,6 +16,6 @@ module.exports = {
       }. Starting with the number ${interaction.options.get('startnumber').value}. <@${interaction.options.get('playerone').user.id}> please use the button bellow to start the roll.`
     );
 
-    await interaction.reply({ embeds: [embed], components: [row] });
+    await interaction.reply({ content: `<@${interaction.options.get('playerone').user.id}>`, embeds: [embed], components: [row] });
   },
 };
