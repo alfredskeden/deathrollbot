@@ -47,3 +47,16 @@ export const deathrollCommandData: ApplicationCommandData = {
     },
   ],
 };
+
+export const retardCommandData: ApplicationCommandData = {
+  name: 'retard',
+  description: 'Transforms a string to retard text.',
+  options: [
+    {
+      name: 'thestring',
+      type: 'STRING',
+      description: 'What do you want to say in retard?',
+      required: true,
+    },
+  ],
+};

@@ -1,18 +1,25 @@
 require('dotenv').config();
 
 import * as fs from 'fs';
+import axios from 'axios';
 import { Client, Collection, Intents, MessageButton, ApplicationCommandData, ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, SelectMenuInteraction } from 'discord.js';
 
 import { randomNumber, errorReply } from './helper/helper';
 import { ICurrentDeathRoll, ICommand } from './helper/interfaces';
-import { deathrollCommandData, jokeCommandData, testCommandData, weatherCommandData } from './helper/slashcommands';
+import { retardCommandData, deathrollCommandData, jokeCommandData, testCommandData, weatherCommandData } from './helper/slashcommands';
+
+const tempToken = {
+  access_token: '',
+  expires_in: 4757717,
+  token_type: 'bearer',
+};
 
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 });
 const commands = new Collection<unknown, ICommand>();
 
-const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
+const commandFiles = fs.readdirSync('./dist/commands').filter((file) => file.endsWith('.js'));
 
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
@@ -44,6 +51,33 @@ client.on('messageCreate', async (message: Message) => {
 
     if (message.content.toLowerCase() === '!deployjoke') {
       await client.guilds.cache.get(message.guild.id)?.commands.create(jokeCommandData);
+    }
+
+    if (message.content.toLowerCase() === '!deployretard') {
+      await client.guilds.cache.get(message.guild.id)?.commands.create(retardCommandData);
+    }
+
+    if (message.content.toLowerCase() === '!gtt') {
+      axios.post(`https://id.twitch.tv/oauth2/token?client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&grant_type=client_credentials`).then((res) => {
+        console.log(res);
+      });
+    }
+
+    if (message.content.toLowerCase() === '!testgetnewworld') {
+      axios
+        .post(`https://api.igdb.com/v4/games`, `fields *; where id = 24654;`, {
+          headers: {
+            Accept: 'application/json',
+            'Client-ID': `${process.env.TWITCH_CLIENT_ID}`,
+            Authorization: `Bearer ${tempToken.access_token}`,
+          },
+        })
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   }
 });

@@ -15,3 +15,8 @@ export interface ICommand {
   description: string;
   execute: Function;
 }
+
+export interface lowHigh {
+  low: number;
+  high: number;
+}
