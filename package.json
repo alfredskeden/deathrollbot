@@ -4,14 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc && node index.js"
+    "dev": "tsc && node ./dist/index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@discordjs/builders": "^0.5.0",
     "axios": "^0.21.1",
-    "discord.js": "^13.0.1",
+    "discord.js": "^13.1.0",
     "dotenv": "^10.0.0",
     "uuid": "^8.3.2"
   },
