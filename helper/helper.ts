@@ -23,48 +23,55 @@ export const retardifyString = (str: string): string => {
 };
 
 export const retardifyString2 = (str: string): string => {
-  var splittedString: Array<string> = str.split(` `); // ?
+  var splittedString: Array<string> = str.split(` `); // Seperates each word on space
 
-  var fiftyPercentForEachWord: Array<lowHigh> = [];
+  var fiftyPercentForEachWord: Array<lowHigh> = []; // Initialize the 50% split per word array.
 
+  /** forEach word do a calculation to find out how many upper case and lower case it fits */
   splittedString.forEach((eachString: string) => {
     const randomNumberThisItteration: number = randomNumber(0, 2);
-    const fifty = {
+    fiftyPercentForEachWord.push({
       low: randomNumberThisItteration === 0 ? Math.floor(eachString.length / 2) : Math.ceil(eachString.length / 2),
       high: randomNumberThisItteration === 0 ? Math.ceil(eachString.length / 2) : Math.floor(eachString.length / 2),
-    };
-    fiftyPercentForEachWord.push(fifty);
+    }); // Push that into the array
   });
 
-  splittedString = splittedString.map((eachString: string, index) => {
-    return eachString
-      .split('')
-      .map((each: string) => {
-        const lowOrHigh = randomNumber(0, 2);
+  /** forEach word in array. split on each letter then map those letters. */
+  splittedString = splittedString.map((eachString: string, index: number) => {
+    return (
+      eachString
+        .split('')
+        .map((each: string) => {
+          const lowOrHigh: number = randomNumber(0, 2); // random between 0 and 1
 
-        if (lowOrHigh === 0) {
-          if (fiftyPercentForEachWord[index].low !== 0) {
-            fiftyPercentForEachWord[index].low = fiftyPercentForEachWord[index].low - 1;
-            each = each.toLowerCase();
+          if (lowOrHigh === 0) {
+            // If you cant do more lowercase do an uppercase instead and negate the counter for that
+            if (fiftyPercentForEachWord[index].low !== 0) {
+              --fiftyPercentForEachWord[index].low;
+              each = each.toLowerCase();
+            } else {
+              --fiftyPercentForEachWord[index].high;
+              each = each.toUpperCase();
+            }
           } else {
-            fiftyPercentForEachWord[index].high = fiftyPercentForEachWord[index].high - 1;
-            each = each.toUpperCase();
+            if (fiftyPercentForEachWord[index].high !== 0) {
+              --fiftyPercentForEachWord[index].high;
+              each = each.toUpperCase();
+            } else {
+              --fiftyPercentForEachWord[index].low;
+              each = each.toLowerCase();
+            }
           }
-        } else {
-          if (fiftyPercentForEachWord[index].high !== 0) {
-            fiftyPercentForEachWord[index].high = fiftyPercentForEachWord[index].high - 1;
-            each = each.toUpperCase();
-          } else {
-            fiftyPercentForEachWord[index].low = fiftyPercentForEachWord[index].low - 1;
-            each = each.toLowerCase();
-          }
-        }
 
-        return each;
-      })
-      .join('');
+          // returns the new upper or lowercase letter to the map.
+          return each;
+        })
+        // joins them again on each letter.
+        .join('')
+    );
   });
 
+  // joins all the splitted
   return splittedString.join(' ');
 };
 
