@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc && node ./dist/index.js"
+    "dev": "tsc && node ./dist/index.js",
+    "deploy": "tsc && forever restart z6uo"
   },
   "author": "",
   "license": "ISC",
