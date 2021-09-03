@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import axios from 'axios';
 import { Client, Collection, Intents, MessageButton, ApplicationCommandData, ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, SelectMenuInteraction } from 'discord.js';
 
-import { randomNumber, errorReply } from './helper/helper';
+import { randomNumber, errorReply, checkDaysLeft } from './helper/helper';
 import { ICurrentDeathRoll, ICommand } from './helper/interfaces';
 import { retardCommandData, deathrollCommandData, jokeCommandData, testCommandData, weatherCommandData } from './helper/slashcommands';
 
@@ -55,6 +55,14 @@ client.on('messageCreate', async (message: Message) => {
 
     if (message.content.toLowerCase() === '!deployretard') {
       await client.guilds.cache.get(message.guild.id)?.commands.create(retardCommandData);
+    }
+
+    if (message.content.toLowerCase() === '!startcountdown') {
+      await message.channel.send(`<@188020680531509249> det är ${checkDaysLeft()} dagar kvar tills New World släpps på PC.`);
+
+      setInterval(async () => {
+        await message.channel.send(`<@188020680531509249> det är ${checkDaysLeft()} dagar kvar tills New World släpps på PC.`);
+      }, 86400000);
     }
 
     if (message.content.toLowerCase() === '!gtt') {

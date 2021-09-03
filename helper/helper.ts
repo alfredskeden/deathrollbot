@@ -22,6 +22,10 @@ export const retardifyString = (str: string): string => {
   return str2.join(``);
 };
 
+export const checkDaysLeft = (): number => {
+  return Math.floor((new Date('2021-09-28').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+};
+
 export const retardifyString2 = (str: string): string => {
   var splittedString: Array<string> = str.split(` `); // Seperates each word on space
 
@@ -83,7 +87,7 @@ export const retardifyString3 = (str: string): string => {
     .map((eachLetter: string) => {
       startIndex = eachLetter === ' ' ? startIndex : startIndex + 1;
 
-      return (eachLetter = startIndex % 2 === 0 ? eachLetter.toUpperCase() : eachLetter.toLowerCase());
+      return (eachLetter = startIndex % 2 === 0 ? eachLetter.toLowerCase() : eachLetter.toUpperCase());
     })
     .join('');
 };
