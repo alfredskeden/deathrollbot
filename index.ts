@@ -58,10 +58,10 @@ client.on('messageCreate', async (message: Message) => {
     }
 
     if (message.content.toLowerCase() === '!startcountdown') {
-      await message.channel.send(`<@188020680531509249> det är ${checkDaysLeft()} dagar kvar tills New World släpps på PC.`);
+      await message.channel.send(`<@&${process.env.NOTIFY_GROUP}> det är ${checkDaysLeft()} dagar kvar tills New World släpps på PC.`);
 
       setInterval(async () => {
-        await message.channel.send(`<@188020680531509249> det är ${checkDaysLeft()} dagar kvar tills New World släpps på PC.`);
+        await message.channel.send(`<@&${process.env.NOTIFY_GROUP}> det är ${checkDaysLeft()} dagar kvar tills New World släpps på PC.`);
       }, 86400000);
     }
 
