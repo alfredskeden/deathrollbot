@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsc && node ./dist/index.js",
-    "deploy": "tsc && forever restart z6uo"
+    "deploy": "tsc && forever restart legB"
   },
   "author": "",
   "license": "ISC",
