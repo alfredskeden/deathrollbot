@@ -76,10 +76,6 @@ client.on('messageCreate', async (message: Message) => {
       printHoursLeftMessageNoIntervall(message);
 
       setTimeout(printHoursLeftMessage, counter, message);
-
-      var intervall = setInterval(async () => {
-        await message.channel.send(`<@&${process.env.NOTIFY_GROUP}> det är ${checkDaysLeft()} dagar och ${checkHoursLeft()} timmar kvar tills New World släpps på PC.`);
-      }, 86400000);
     }
 
     if (message.content.toLowerCase() === '!gtt') {
