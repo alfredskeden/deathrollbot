@@ -27,7 +27,7 @@ export const checkDaysLeft = (): number => {
 };
 
 export const checkHoursLeft = (): number => {
-  return Math.floor(Math.abs(new Date('2021-09-28 09:00:00').getTime() - new Date().getTime()) / 36e5);
+  return Math.floor((new Date('2021-09-28 09:00:00').getTime() - new Date().getTime()) / 1000 / 60 / 60);
 };
 
 export const retardifyString2 = (str: string): string => {
