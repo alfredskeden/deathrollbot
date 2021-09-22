@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import axios from 'axios';
 import { Client, Collection, Intents, MessageButton, ApplicationCommandData, ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, SelectMenuInteraction } from 'discord.js';
 
-import { randomNumber, errorReply, checkDaysLeft } from './helper/helper';
+import { randomNumber, errorReply, checkDaysLeft, checkHoursLeft } from './helper/helper';
 import { ICurrentDeathRoll, ICommand } from './helper/interfaces';
 import { retardCommandData, deathrollCommandData, jokeCommandData, testCommandData, weatherCommandData } from './helper/slashcommands';
 
@@ -32,6 +32,21 @@ client.once('ready', () => {
   console.log('Ready!');
 });
 
+var counter: number = 86400000;
+
+const printHoursLeftTheMessage = async (message: Message) => {
+  await message.channel.send(`<@&${process.env.NOTIFY_GROUP}> det är ${checkDaysLeft()} dagar och ${checkHoursLeft()} timmar kvar tills New World släpps på PC.`);
+};
+
+const printHoursLeftMessageNoIntervall = (message: Message) => {
+  printHoursLeftTheMessage(message);
+};
+
+const printHoursLeftMessage = (message: Message) => {
+  printHoursLeftTheMessage(message);
+  setTimeout(printHoursLeftMessage, counter * (checkDaysLeft() / 10), message);
+};
+
 /** For each message */
 client.on('messageCreate', async (message: Message) => {
   if (!client.application?.owner) await client.application?.fetch();
@@ -58,10 +73,12 @@ client.on('messageCreate', async (message: Message) => {
     }
 
     if (message.content.toLowerCase() === '!startcountdown') {
-      await message.channel.send(`<@&${process.env.NOTIFY_GROUP}> det är ${checkDaysLeft()} dagar kvar tills New World släpps på PC.`);
+      printHoursLeftMessageNoIntervall(message);
 
-      setInterval(async () => {
-        await message.channel.send(`<@&${process.env.NOTIFY_GROUP}> det är ${checkDaysLeft()} dagar kvar tills New World släpps på PC.`);
+      setTimeout(printHoursLeftMessage, counter, message);
+
+      var intervall = setInterval(async () => {
+        await message.channel.send(`<@&${process.env.NOTIFY_GROUP}> det är ${checkDaysLeft()} dagar och ${checkHoursLeft()} timmar kvar tills New World släpps på PC.`);
       }, 86400000);
     }
 

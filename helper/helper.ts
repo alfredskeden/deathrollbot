@@ -23,7 +23,11 @@ export const retardifyString = (str: string): string => {
 };
 
 export const checkDaysLeft = (): number => {
-  return Math.floor((new Date('2021-09-28').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+  return Math.floor((new Date('2021-09-28 09:00:00').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+};
+
+export const checkHoursLeft = (): number => {
+  return Math.floor(Math.abs(new Date('2021-09-28 09:00:00').getTime() - new Date().getTime()) / 36e5);
 };
 
 export const retardifyString2 = (str: string): string => {
