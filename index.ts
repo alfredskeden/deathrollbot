@@ -32,10 +32,10 @@ client.once('ready', () => {
   console.log('Ready!');
 });
 
-var counter: number = 86400000;
+var counter: number = 86400000 / 2;
 
 const printHoursLeftTheMessage = async (message: Message) => {
-  await message.channel.send(`<@&${process.env.NOTIFY_GROUP}> det är ${checkDaysLeft()} dagar och ${checkHoursLeft()} timmar kvar tills New World släpps på PC.`);
+  await message.channel.send(`<@&${process.env.NOTIFY_GROUP}> det är ${checkDaysLeft()} dagar och ${checkHoursLeft() - checkDaysLeft() * 24} timmar kvar tills New World släpps på PC.`);
 };
 
 const printHoursLeftMessageNoIntervall = (message: Message) => {
@@ -44,7 +44,9 @@ const printHoursLeftMessageNoIntervall = (message: Message) => {
 
 const printHoursLeftMessage = (message: Message) => {
   printHoursLeftTheMessage(message);
-  setTimeout(printHoursLeftMessage, counter * (checkDaysLeft() / 10), message);
+  if (checkHoursLeft() > 0) {
+    setTimeout(printHoursLeftMessage, counter * (checkHoursLeft() / 100), message);
+  }
 };
 
 /** For each message */
