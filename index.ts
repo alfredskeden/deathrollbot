@@ -33,6 +33,7 @@ client.once('ready', () => {
 });
 
 var counter: number = 86400000 / 2;
+var firstTime: boolean = false;
 
 const printHoursLeftTheMessage = async (message: Message) => {
   await message.channel.send(`<@&${process.env.NOTIFY_GROUP}> det är ${checkDaysLeft()} dagar och ${checkHoursLeft() - checkDaysLeft() * 24} timmar kvar tills New World släpps på PC.`);
@@ -42,10 +43,31 @@ const printHoursLeftMessageNoIntervall = (message: Message) => {
   printHoursLeftTheMessage(message);
 };
 
-const printHoursLeftMessage = (message: Message) => {
+const printHoursLeftMessage = async (message: Message) => {
   printHoursLeftTheMessage(message);
   if (checkHoursLeft() > 0) {
     setTimeout(printHoursLeftMessage, counter * (checkHoursLeft() / 100), message);
+  }
+
+  if (checkHoursLeft() >= 0 && !firstTime) {
+    firstTime = true;
+    await message.channel.send(`<@&${process.env.NOTIFY_GROUP}> New World har släppts, IN MED ER!!`);
+
+    setTimeout(async () => {
+      await message.channel.send(`https://media0.giphy.com/media/26tOZ42Mg6pbTUPHW/giphy.gif`);
+
+      setTimeout(async () => {
+        await message.channel.send(`https://i.pinimg.com/originals/75/05/dc/7505dccdc71025d0db695e07703b83c3.gif`);
+
+        setTimeout(async () => {
+          await message.channel.send(`https://c.tenor.com/Rdz9M0h2BoQAAAAC/confetti.gif`);
+
+          setTimeout(async () => {
+            await message.channel.send(`https://thumbs.gfycat.com/LavishInnocentHarvestmouse-max-1mb.gif`);
+          }, 3000);
+        }, 3000);
+      }, 3000);
+    }, 3000);
   }
 };
 
@@ -77,7 +99,7 @@ client.on('messageCreate', async (message: Message) => {
     if (message.content.toLowerCase() === '!startcountdown') {
       printHoursLeftMessageNoIntervall(message);
 
-      setTimeout(printHoursLeftMessage, counter, message);
+      setTimeout(printHoursLeftMessage, counter * (checkHoursLeft() / 100), message);
     }
 
     if (message.content.toLowerCase() === '!gtt') {
