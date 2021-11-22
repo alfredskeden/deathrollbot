@@ -2,7 +2,7 @@ require('dotenv').config();
 
 import * as fs from 'fs';
 import axios from 'axios';
-import { Client, Collection, Intents, MessageButton, ApplicationCommandData, ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, SelectMenuInteraction } from 'discord.js';
+import { Client, Collection, Intents, MessageButton, ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, SelectMenuInteraction } from 'discord.js';
 
 import { randomNumber, errorReply, checkDaysLeft, checkHoursLeft } from './helper/helper';
 import { ICurrentDeathRoll, ICommand } from './helper/interfaces';
@@ -28,8 +28,12 @@ for (const file of commandFiles) {
 
 const currentDeathrolls: Array<ICurrentDeathRoll> = [];
 
-client.once('ready', () => {
+client.once('ready', async () => {
   console.log('Ready!');
+  const response = await axios.get('https://data.messari.io/api/v1/assets/shib/metrics');
+  const data = response.data;
+  const price = data.data.market_data.price_usd;
+  client.user.setActivity(`${price} USD`);
 });
 
 var counter: number = 86400000 / 2;
@@ -100,6 +104,14 @@ client.on('messageCreate', async (message: Message) => {
       printHoursLeftMessageNoIntervall(message);
 
       setTimeout(printHoursLeftMessage, counter * (checkHoursLeft() / 100), message);
+    }
+
+    // fetch from https://data.messari.io/api/v1/assets/shib/metrics and display market_data price usd as discord playing message
+    // with a setTimeout
+    if (message.content.toLowerCase() === '!setshibplaying') {
+      setInterval(async () => {
+        //await message.channel.send(`${price}`);
+      }, 60000);
     }
 
     if (message.content.toLowerCase() === '!gtt') {
