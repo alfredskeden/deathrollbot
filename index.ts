@@ -30,14 +30,12 @@ const currentDeathrolls: Array<ICurrentDeathRoll> = [];
 
 client.once('ready', async () => {
   console.log('Ready!');
-  const response = await axios.get('https://data.messari.io/api/v1/assets/shib/metrics');
-  const data = response.data;
-  const price = data.data.market_data.price_usd;
-  client.user.setActivity(`${price} USD`);
+  client.user.setActivity('SHIB USD PRICE', { type: 'WATCHING' });
 });
 
 var counter: number = 86400000 / 2;
 var firstTime: boolean = false;
+var shibPriceWatchingStarted: boolean;
 
 const printHoursLeftTheMessage = async (message: Message) => {
   await message.channel.send(`<@&${process.env.NOTIFY_GROUP}> det är ${checkDaysLeft()} dagar och ${checkHoursLeft() - checkDaysLeft() * 24} timmar kvar tills New World släpps på PC.`);
@@ -109,9 +107,15 @@ client.on('messageCreate', async (message: Message) => {
     // fetch from https://data.messari.io/api/v1/assets/shib/metrics and display market_data price usd as discord playing message
     // with a setTimeout
     if (message.content.toLowerCase() === '!setshibplaying') {
-      setInterval(async () => {
-        //await message.channel.send(`${price}`);
-      }, 60000);
+      if (!shibPriceWatchingStarted) {
+        shibPriceWatchingStarted = true;
+        setInterval(async () => {
+          const response = await axios.get('https://data.messari.io/api/v1/assets/shib/metrics');
+          const data = response.data;
+          const price = data.data.market_data.price_usd;
+          client.guilds.cache.get(process.env.WALLA_ID)?.members.cache.get(client.user.id)?.setNickname(price.toFixed(10));
+        }, 60000);
+      }
     }
 
     if (message.content.toLowerCase() === '!gtt') {
