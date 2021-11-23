@@ -114,7 +114,7 @@ client.on('messageCreate', async (message: Message) => {
           const data = response.data;
           const price = data.data.market_data.price_usd;
           client.guilds.cache.get(process.env.WALLA_ID)?.members.cache.get(client.user.id)?.setNickname(price.toFixed(10));
-        }, 60000);
+        }, 1800000);
       }
     }
 
